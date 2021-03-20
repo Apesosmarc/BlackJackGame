@@ -1,20 +1,16 @@
-// https://replit.com/@Apesosmarc/bjgame#index.js
-
-// THIS CODE RUNS BEST IN BROWSER ON REPLIT COPY AND PASTE ABOVE LINK
-
 let value = [
-  [2, 2, 2, 2],
-  [3, 3, 3, 3],
-  [4, 4, 4, 4],
-  [5, 5, 5, 5],
-  [6, 6, 6, 6],
-  [7, 7, 7, 7],
-  [8, 8, 8, 8],
-  [9, 9, 9, 9],
-  [10, 10, 10, 10],
-  ["J", "J", "J", "J"],
-  ["Q", "Q", "Q", "Q"],
-  ["K", "K", "K", "K"],
+  // [2, 2, 2, 2],
+  // [3, 3, 3, 3],
+  // [4, 4, 4, 4],
+  // [5, 5, 5, 5],
+  // [6, 6, 6, 6],
+  // [7, 7, 7, 7],
+  // [8, 8, 8, 8],
+  // [9, 9, 9, 9],
+  // [10, 10, 10, 10],
+  // ["J", "J", "J", "J"],
+  // ["Q", "Q", "Q", "Q"],
+  // ["K", "K", "K", "K"],
   ["A", "A", "A", "A"],
 ];
 
@@ -114,20 +110,6 @@ function pick(arr) {
   return card;
 }
 
-function firstHand() {
-  let pickValue = pick(value);
-  let suitValue = pick(suit);
-  let bjValue = 0;
-  if (pickValue === "A") {
-    bjValue += 11;
-  } else if (pickValue === "J" || pickValue === "K" || pickValue === "Q") {
-    bjValue += 10;
-  } else {
-    bjValue += pickValue;
-  }
-  console.log(`${pickValue} of ${suitValue} value of ${bjValue}`);
-}
-
 function deal() {
   let dealerTally = 0;
   let playerTally = 0;
@@ -137,8 +119,10 @@ function deal() {
     let suitValue = pick(suit);
     let bjValue = 0;
 
-    if (pickValue === "A") {
+    if (pickValue === "A" && dealerTally + 11 <= 21) {
       bjValue += 11;
+    } else if (pickValue === "A" && dealerTally + 11 > 21) {
+      bjValue += 1;
     } else if (pickValue === "J" || pickValue === "K" || pickValue === "Q") {
       bjValue += 10;
     } else {
@@ -161,8 +145,16 @@ function deal() {
     let suitValue = pick(suit);
     let bjValue = 0;
 
+    if (pickValue === "A" && dealerTally + 11 <= 21) {
+      bjValue += 11;
+    } else if (pickValue === "A" && dealerTally + 11 > 21) {
+      bjValue += 1;
+    }
+
     if (pickValue === "A") {
       bjValue += 11;
+    } else if (pickValue === "A" && playerTally + 11 > 21) {
+      bjValue += 1;
     } else if (pickValue === "J" || pickValue === "K" || pickValue === "Q") {
       bjValue += 10;
     } else {
@@ -185,6 +177,10 @@ function deal() {
       let userPrompt = prompt(
         `Your total is ${playerTally}. Would you like to hit or stay?`
       ).toLowerCase();
+      if (userPrompt === "stay" && playerTally < dealerTally) {
+        console.log("Dealer wins!");
+        playAgain();
+      }
       if (userPrompt === "hit") {
         return pCardPick();
       } else {
@@ -209,6 +205,10 @@ function deal() {
   console.log(`DEALER'S HAND:`);
   dCardPick();
   dCardPick();
+  if (dealerTally === 21) {
+    console.log("dealer blackjack you lose!");
+    playAgain();
+  }
   console.log(`Dealer total: ${dealerTally}`);
   pCardPick();
   pCardPick();
