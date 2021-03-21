@@ -116,10 +116,15 @@ function deal() {
   let dealerHand = [];
 
   function handCount(card, hand, tally, pickValue) {
+    let numOfA = hand.filter((card) => card != "A").length;
     if (hand.includes("A") && card + tally <= 21) {
       return card;
-    } else if (pickValue === "A" && hand.includes("A") && card + tally > 21) {
-      return "reduce";
+    } else if (hand.includes("A") && card + tally > 21) {
+      if (numOfA >= 2 && card + tally + numOfA > 21) {
+        return "bust";
+      } else {
+        return "reduce";
+      }
     }
   }
 
@@ -144,8 +149,12 @@ function deal() {
     if (handCount(bjValue, dealerHand, dealerTally, pickValue) === "reduce") {
       dealerTally -= 10;
     }
-
+    if (handCount(bjValue, dealerHand, dealerTally, pickValue) === "bust") {
+      console.log("Dealer busts you win!");
+      playAgain();
+    }
     dealerTally += bjValue;
+
     if (dealerTally >= 22) {
       console.log(`Dealer total ${dealerTally}. Dealer busts you win!`);
       playAgain();
@@ -177,7 +186,10 @@ function deal() {
     if (handCount(bjValue, playerHand, playerTally, pickValue) === "reduce") {
       playerTally -= 10;
     }
-
+    if (handCount(bjValue, dealerHand, dealerTally, pickValue) === "bust") {
+      console.log("You bust you lose!");
+      playAgain();
+    }
     playerTally += bjValue;
 
     if (playerTally >= 22) {
