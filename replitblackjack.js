@@ -1,16 +1,16 @@
 let value = [
-  // [2, 2, 2, 2],
-  // [3, 3, 3, 3],
-  // [4, 4, 4, 4],
-  // [5, 5, 5, 5],
-  // [6, 6, 6, 6],
-  // [7, 7, 7, 7],
-  // [8, 8, 8, 8],
-  // [9, 9, 9, 9],
-  // [10, 10, 10, 10],
-  // ["J", "J", "J", "J"],
-  // ["Q", "Q", "Q", "Q"],
-  // ["K", "K", "K", "K"],
+  [2, 2, 2, 2],
+  [3, 3, 3, 3],
+  [4, 4, 4, 4],
+  [5, 5, 5, 5],
+  [6, 6, 6, 6],
+  [7, 7, 7, 7],
+  [8, 8, 8, 8],
+  [9, 9, 9, 9],
+  [10, 10, 10, 10],
+  ["J", "J", "J", "J"],
+  ["Q", "Q", "Q", "Q"],
+  ["K", "K", "K", "K"],
   ["A", "A", "A", "A"],
 ];
 
@@ -81,7 +81,6 @@ function welcome() {
 
   deal();
 }
-
 welcome();
 
 function playAgain() {
@@ -101,8 +100,8 @@ function pick(arr) {
     idx = Math.floor(Math.random() * arr.length);
     counter++;
     if (counter === 52) {
-      alert("You're out of cards m8");
-      break;
+      alert("You're out of cards m8 refresh to continue");
+      throw new Error("");
     }
   }
   const card = arr[idx][cardIdx];
@@ -113,11 +112,23 @@ function pick(arr) {
 function deal() {
   let dealerTally = 0;
   let playerTally = 0;
+  let playerHand = [];
+  let dealerHand = [];
+
+  function handCount(card, hand, tally) {
+    if (hand.includes("A") && card + tally <= 21) {
+      return card;
+    } else if (hand.includes("A") && card + tally > 21) {
+      return "reduce";
+    }
+  }
 
   function dCardPick() {
     let pickValue = pick(value);
     let suitValue = pick(suit);
     let bjValue = 0;
+
+    dealerHand.push(pickValue);
 
     if (pickValue === "A" && dealerTally + 11 <= 21) {
       bjValue += 11;
@@ -129,6 +140,10 @@ function deal() {
       bjValue += pickValue;
     }
     console.log(`${pickValue} of ${suitValue}`);
+
+    if (handCount(bjValue, dealerHand, dealerTally) === "reduce") {
+      dealerTally -= 10;
+    }
 
     dealerTally += bjValue;
     if (dealerTally >= 22) {
@@ -145,13 +160,9 @@ function deal() {
     let suitValue = pick(suit);
     let bjValue = 0;
 
-    if (pickValue === "A" && dealerTally + 11 <= 21) {
-      bjValue += 11;
-    } else if (pickValue === "A" && dealerTally + 11 > 21) {
-      bjValue += 1;
-    }
+    playerHand.push(pickValue);
 
-    if (pickValue === "A") {
+    if (pickValue === "A" && playerTally + 11 <= 21) {
       bjValue += 11;
     } else if (pickValue === "A" && playerTally + 11 > 21) {
       bjValue += 1;
@@ -161,7 +172,12 @@ function deal() {
       bjValue += pickValue;
     }
     playerTally += bjValue;
+
     console.log(`${pickValue} of ${suitValue}`);
+
+    if (handCount(bjValue, dealerHand, dealerTally) === "reduce") {
+      dealerTally -= 10;
+    }
 
     if (playerTally >= 22) {
       alert(`Your total is ${playerTally} you lose!`);
@@ -197,6 +213,9 @@ function deal() {
           console.log("dealer hits...");
           console.log(dCardPick());
           console.log(`Dealer total is ${dealerTally}`);
+        } else if (dealerTally > playerTally) {
+          console.log("better luck next time!");
+          playAgain();
         }
       }
     }
