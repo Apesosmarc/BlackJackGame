@@ -12,6 +12,9 @@ let value = [
   ["Q", "Q", "Q", "Q"],
   ["K", "K", "K", "K"],
   ["A", "A", "A", "A"],
+  ["A", "A", "A", "A"],
+  ["A", "A", "A", "A"],
+  ["A", "A", "A", "A"],
 ];
 
 let suit = [
@@ -115,10 +118,10 @@ function deal() {
   let playerHand = [];
   let dealerHand = [];
 
-  function handCount(card, hand, tally) {
+  function handCount(card, hand, tally, pickValue) {
     if (hand.includes("A") && card + tally <= 21) {
       return card;
-    } else if (hand.includes("A") && card + tally > 21) {
+    } else if (pickValue === "A" && hand.includes("A") && card + tally > 21) {
       return "reduce";
     }
   }
@@ -141,7 +144,7 @@ function deal() {
     }
     console.log(`${pickValue} of ${suitValue}`);
 
-    if (handCount(bjValue, dealerHand, dealerTally) === "reduce") {
+    if (handCount(bjValue, dealerHand, dealerTally, pickValue) === "reduce") {
       dealerTally -= 10;
     }
 
@@ -171,13 +174,14 @@ function deal() {
     } else {
       bjValue += pickValue;
     }
-    playerTally += bjValue;
 
     console.log(`${pickValue} of ${suitValue}`);
 
-    if (handCount(bjValue, dealerHand, dealerTally) === "reduce") {
-      dealerTally -= 10;
+    if (handCount(bjValue, playerHand, playerTally, pickValue) === "reduce") {
+      playerTally -= 10;
     }
+
+    playerTally += bjValue;
 
     if (playerTally >= 22) {
       alert(`Your total is ${playerTally} you lose!`);
@@ -200,22 +204,24 @@ function deal() {
       if (userPrompt === "hit") {
         return pCardPick();
       } else {
-        console.log("dealer hits...");
-        console.log(dCardPick());
-        console.log(`Dealer total is ${dealerTally}`);
-        if (dealerTally === playerTally) {
-          console.log("it's a draw!");
-          playAgain();
-        } else if (dealerTally > playerTally) {
-          console.log("better luck next time!");
-          playAgain();
-        } else if (dealerTally < playerTally) {
+        while (dealerTally < 21) {
           console.log("dealer hits...");
-          console.log(dCardPick());
+          dCardPick();
           console.log(`Dealer total is ${dealerTally}`);
-        } else if (dealerTally > playerTally) {
-          console.log("better luck next time!");
-          playAgain();
+          if (dealerTally === playerTally && dealerTally === 21) {
+            console.log("it's a draw!");
+            playAgain();
+          } else if (dealerTally > playerTally) {
+            console.log("better luck next time!");
+            playAgain();
+          } else if (dealerTally < playerTally) {
+            console.log("dealer hits...");
+            console.log(dCardPick());
+            console.log(`Dealer total is ${dealerTally}`);
+          } else if (dealerTally > playerTally) {
+            console.log("better luck next time!");
+            playAgain();
+          }
         }
       }
     }
