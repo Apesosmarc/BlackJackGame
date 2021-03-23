@@ -110,113 +110,89 @@ function pick(arr) {
 }
 
 function deal() {
-  let dealerTally = 0;
-  let playerTally = 0;
   let playerHand = [];
   let dealerHand = [];
+  let dealerTally = 0;
+  let playerTally = 0;
 
-  function handCount(card, hand, tally, pickValue) {
-    let numOfA = hand.filter((card) => card != "A").length;
-    if (hand.includes("A") && card + tally <= 21) {
-      return card;
-    } else if (hand.includes("A") && card + tally > 21) {
-      if (numOfA >= 2 && card + tally + numOfA > 21) {
-        return "bust";
+  function tallyHand(hand) {
+    let sum = 0;
+    let hasAce = false;
+
+    for (let card of hand) {
+      if (card === "A") {
+        hasAce = true;
+        sum += 11;
+      } else if (card === "J" || card === "K" || card === "Q") {
+        sum += 10;
       } else {
-        return "reduce";
+        sum += card;
       }
     }
+    for (let card of hand) {
+      if (card === "A" && sum > 21) {
+        sum -= 10;
+      }
+    }
+    return sum;
   }
 
   function dCardPick() {
-    let pickValue = pick(value);
+    let card = pick(value);
     let suitValue = pick(suit);
-    let bjValue = 0;
+    dealerHand.push(card);
+    console.log(`${card} of ${suitValue}`);
+    let currTally = tallyHand(dealerHand);
 
-    dealerHand.push(pickValue);
-
-    if (pickValue === "A" && dealerTally + 11 <= 21) {
-      bjValue += 11;
-    } else if (pickValue === "A" && dealerTally + 11 > 21) {
-      bjValue += 1;
-    } else if (pickValue === "J" || pickValue === "K" || pickValue === "Q") {
-      bjValue += 10;
-    } else {
-      bjValue += pickValue;
+    if (dealerHand.length > 1) {
+      console.log(`Dealer Total: ${currTally}`);
     }
-    console.log(`${pickValue} of ${suitValue}`);
-
-    if (handCount(bjValue, dealerHand, dealerTally, pickValue) === "reduce") {
-      dealerTally -= 10;
-    }
-    if (handCount(bjValue, dealerHand, dealerTally, pickValue) === "bust") {
-      console.log("Dealer busts you win!");
+    if (currTally >= 22) {
+      console.log(`Dealer total ${currTally}. Dealer busts you win!`);
       playAgain();
-    }
-    dealerTally += bjValue;
-
-    if (dealerTally >= 22) {
-      console.log(`Dealer total ${dealerTally}. Dealer busts you win!`);
-      playAgain();
-    } else if (dealerTally === 21 && playerTally != 0) {
+    } else if (currTally === 21 && playerHand.length === 0) {
       console.log("Dealer blackjack you lose!");
       playAgain();
     }
+    return currTally;
   }
 
   function pCardPick() {
-    let pickValue = pick(value);
+    let card = pick(value);
     let suitValue = pick(suit);
-    let bjValue = 0;
 
-    playerHand.push(pickValue);
+    playerHand.push(card);
+    console.log(`${card} of ${suitValue}`);
+    let currTally = tallyHand(playerHand);
 
-    if (pickValue === "A" && playerTally + 11 <= 21) {
-      bjValue += 11;
-    } else if (pickValue === "A" && playerTally + 11 > 21) {
-      bjValue += 1;
-    } else if (pickValue === "J" || pickValue === "K" || pickValue === "Q") {
-      bjValue += 10;
-    } else {
-      bjValue += pickValue;
+    if (playerHand.length > 1) {
+      console.log(`Player Total: ${currTally}`);
     }
 
-    console.log(`${pickValue} of ${suitValue}`);
-
-    if (handCount(bjValue, playerHand, playerTally, pickValue) === "reduce") {
-      playerTally -= 10;
-    }
-    if (handCount(bjValue, dealerHand, dealerTally, pickValue) === "bust") {
-      console.log("You bust you lose!");
+    if (currTally >= 22) {
+      console.log(`Your total is ${currTally} you lose!`);
+      playAgain();
+    } else if (currTally === 21) {
+      console.log("BlackJack You Win!");
       playAgain();
     }
-    playerTally += bjValue;
-
-    if (playerTally >= 22) {
-      alert(`Your total is ${playerTally} you lose!`);
-      playAgain();
-    } else if (playerTally === 21) {
-      alert("BlackJack You Win!");
-      playAgain();
-    }
+    return currTally;
   }
 
   function userPrompt() {
     if (playerTally <= 21 && dealerTally < 21) {
-      let userPrompt = prompt(
-        `Your total is ${playerTally}. Would you like to hit or stay?`
-      ).toLowerCase();
+      let userPrompt = prompt(`Would you like to hit or stay?`).toLowerCase();
       if (userPrompt === "stay" && playerTally < dealerTally) {
         console.log("Dealer wins!");
         playAgain();
       }
       if (userPrompt === "hit") {
-        return pCardPick();
+        playerTally = pCardPick();
       } else {
         while (dealerTally < 21) {
           console.log("dealer hits...");
-          dCardPick();
-          console.log(`Dealer total is ${dealerTally}`);
+          dealerTally = dCardPick();
+
           if (dealerTally === playerTally && dealerTally === 21) {
             console.log("it's a draw!");
             playAgain();
@@ -226,7 +202,6 @@ function deal() {
           } else if (dealerTally < playerTally) {
             console.log("dealer hits...");
             console.log(dCardPick());
-            console.log(`Dealer total is ${dealerTally}`);
           } else if (dealerTally > playerTally) {
             console.log("better luck next time!");
             playAgain();
@@ -238,16 +213,11 @@ function deal() {
 
   console.log(`DEALER'S HAND:`);
   dCardPick();
-  dCardPick();
-  if (dealerTally === 21) {
-    console.log("dealer blackjack you lose!");
-    playAgain();
-  }
-  console.log(`Dealer total: ${dealerTally}`);
+  dealerTally += dCardPick();
   pCardPick();
-  pCardPick();
-  console.log(`Player total: ${playerTally}`);
-  while (playerTally < 21) {
+  playerTally += pCardPick();
+
+  while (playerHand.length >= 2 && playerHand.length < 6) {
     userPrompt();
   }
 }
